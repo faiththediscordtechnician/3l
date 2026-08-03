@@ -1,28 +1,86 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { auth, setAuthToken, getAuthToken } from './utils/api'
+import { Window } from './components/Window'
+import { Mascot } from './components/Mascot'
 import './App.css'
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getAuthToken())
+  const [username, setUsername] = useState('admin')
+  const [password, setPassword] = useState('admin123')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [mascotState, setMascotState] = useState('idle')
+  const [windows, setWindows] = useState({
+    dashboard: { open: true, title: '3L ACADEMIC HUB' },
+  })
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    // TODO: Connect to backend auth
-    setIsLoggedIn(true)
+    setError('')
+    setLoading(true)
+    setMascotState('concentrating')
+
+    try {
+      const response = await auth.login(username, password)
+      setAuthToken(response.access_token)
+      setIsLoggedIn(true)
+      setMascotState('happy')
+      setTimeout(() => setMascotState('idle'), 600)
+    } catch (err) {
+      setError('Login failed. Please check your credentials.')
+      setMascotState('idle')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = () => {
+    setAuthToken(null)
+    setIsLoggedIn(false)
+    setUsername('')
+    setPassword('')
+    setWindows({})
+    setMascotState('idle')
+  }
+
+  const toggleWindow = (windowId) => {
+    setWindows((prev) => ({
+      ...prev,
+      [windowId]: {
+        ...prev[windowId],
+        open: !prev[windowId]?.open,
+      },
+    }))
+  }
+
+  const closeWindow = (windowId) => {
+    if (windowId !== 'dashboard') {
+      setWindows((prev) => ({
+        ...prev,
+        [windowId]: { ...prev[windowId], open: false },
+      }))
+    }
   }
 
   if (!isLoggedIn) {
     return (
       <div className="login-container">
-        <div className="login-window window">
+        <div className="login-window window" style={{ animation: 'bounce 0.6s ease-out' }}>
           <div className="window-header">
             <span>3L ACADEMIC HUB</span>
-            <button className="window-close-btn">×</button>
+            <div style={{ width: '20px' }} />
           </div>
           <div className="window-content login-form">
+            <div className="mascot-container">
+              <Mascot state={mascotState} />
+            </div>
             <h1>Welcome</h1>
+            <p className="login-subtitle">Login to your personal academic hub</p>
+
             <form onSubmit={handleLogin}>
+              {error && <div className="error-message">{error}</div>}
+
               <div className="form-group">
                 <label>Username</label>
                 <input
@@ -30,8 +88,10 @@ function App() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter username"
+                  disabled={loading}
                 />
               </div>
+
               <div className="form-group">
                 <label>Password</label>
                 <input
@@ -39,10 +99,16 @@ function App() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password"
+                  disabled={loading}
                 />
               </div>
-              <button type="submit">LOGIN</button>
+
+              <button type="submit" disabled={loading}>
+                {loading ? 'LOGGING IN...' : 'LOGIN'}
+              </button>
             </form>
+
+            <p className="login-hint">Default: admin / admin123</p>
           </div>
         </div>
       </div>
@@ -51,8 +117,42 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>3L Academic Hub - Dashboard</h1>
-      <p>Coming soon...</p>
+      <div className="header-bar">
+        <div className="header-left">
+          <div className="mascot-mini">
+            <Mascot state={mascotState} />
+          </div>
+          <h1 className="app-title">3L ACADEMIC HUB</h1>
+        </div>
+        <div className="header-right">
+          <button className="logout-btn" onClick={handleLogout}>LOGOUT</button>
+        </div>
+      </div>
+
+      <div className="windows-container">
+        {windows.dashboard?.open && (
+          <Window
+            id="dashboard"
+            title="DASHBOARD"
+            onClose={() => {}}
+            zIndex={100}
+          >
+            <div className="dashboard-content">
+              <h2>Your Classes</h2>
+              <p>Classes section coming soon...</p>
+
+              <div className="quick-actions">
+                <button className="action-btn">NEW CLASS</button>
+                <button className="action-btn">NEW READING</button>
+                <button className="action-btn">NEW TODO</button>
+              </div>
+
+              <h3>Recent Activity</h3>
+              <p>No activity yet. Start by creating a class!</p>
+            </div>
+          </Window>
+        )}
+      </div>
     </div>
   )
 }
