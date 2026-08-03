@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, pool, event
+from sqlalchemy import create_engine, pool, event, text
 from sqlalchemy.orm import sessionmaker
 from config import DATABASE_URL
 import logging
@@ -28,7 +28,7 @@ def verify_database_connection():
     """Verify database connection on startup"""
     try:
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         logger.info("✓ Database connection successful")
         return True
     except Exception as e:
