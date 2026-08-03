@@ -7,6 +7,9 @@ from routes.classes import router as classes_router
 from routes.readings import router as readings_router
 from routes.notes import router as notes_router
 from routes.todos import router as todos_router
+from routes.search import router as search_router
+from routes.annotations import router as annotations_router
+from routes.export import router as export_router
 from models import Base, User
 from database import engine, SessionLocal
 from auth import get_password_hash
@@ -48,6 +51,9 @@ app.include_router(classes_router)
 app.include_router(readings_router)
 app.include_router(notes_router)
 app.include_router(todos_router)
+app.include_router(search_router)
+app.include_router(annotations_router)
+app.include_router(export_router)
 
 @app.on_event("startup")
 def startup_event():
