@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { auth, setAuthToken, getAuthToken } from './utils/api'
+import { syncManager } from './utils/syncManager'
 import { Window } from './components/Window'
 import { Mascot } from './components/Mascot'
+import { SyncIndicator } from './components/SyncIndicator'
 import './App.css'
 
 function App() {
@@ -14,6 +16,13 @@ function App() {
   const [windows, setWindows] = useState({
     dashboard: { open: true, title: '3L ACADEMIC HUB' },
   })
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      syncManager.startAutoSync(5000)
+      return () => syncManager.stopAutoSync()
+    }
+  }, [isLoggedIn])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -123,6 +132,9 @@ function App() {
             <Mascot state={mascotState} />
           </div>
           <h1 className="app-title">3L ACADEMIC HUB</h1>
+        </div>
+        <div className="header-center">
+          <SyncIndicator />
         </div>
         <div className="header-right">
           <button className="logout-btn" onClick={handleLogout}>LOGOUT</button>

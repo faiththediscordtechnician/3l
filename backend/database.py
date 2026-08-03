@@ -1,8 +1,20 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, pool, event
 from sqlalchemy.orm import sessionmaker
 from config import DATABASE_URL
+import logging
 
-engine = create_engine(DATABASE_URL, echo=False)
+logger = logging.getLogger(__name__)
+
+engine = create_engine(
+    DATABASE_URL,
+    echo=False,
+    poolclass=pool.QueuePool,
+    pool_size=5,
+    max_overflow=10,
+    pool_pre_ping=True,
+    pool_recycle=3600,
+)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
@@ -11,3 +23,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def verify_database_connection():
+    """Verify database connection on startup"""
+    try:
+        with engine.connect() as conn:
+            conn.execute("SELECT 1")
+        logger.info("✓ Database connection successful")
+        return True
+    except Exception as e:
+        logger.error(f"✗ Database connection failed: {e}")
+        return False

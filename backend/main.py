@@ -10,8 +10,9 @@ from routes.todos import router as todos_router
 from routes.search import router as search_router
 from routes.annotations import router as annotations_router
 from routes.export import router as export_router
+from routes.sync import router as sync_router
 from models import Base, User
-from database import engine, SessionLocal
+from database import engine, SessionLocal, verify_database_connection
 from auth import get_password_hash
 
 load_dotenv()
@@ -20,13 +21,19 @@ Base.metadata.create_all(bind=engine)
 
 def create_default_user():
     db = SessionLocal()
-    admin_user = db.query(User).filter(User.username == "admin").first()
-    if not admin_user:
-        hashed_password = get_password_hash("admin123")
-        admin_user = User(username="admin", password_hash=hashed_password)
-        db.add(admin_user)
-        db.commit()
-    db.close()
+    try:
+        admin_user = db.query(User).filter(User.username == "admin").first()
+        if not admin_user:
+            hashed_password = get_password_hash("admin123")
+            admin_user = User(username="admin", password_hash=hashed_password)
+            db.add(admin_user)
+            db.commit()
+            print("✓ Default admin user created")
+    except Exception as e:
+        print(f"✗ Error creating default user: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
 app = FastAPI(title="3L Academic Hub", version="1.0.0")
 
@@ -54,6 +61,7 @@ app.include_router(todos_router)
 app.include_router(search_router)
 app.include_router(annotations_router)
 app.include_router(export_router)
+app.include_router(sync_router)
 
 @app.on_event("startup")
 def startup_event():

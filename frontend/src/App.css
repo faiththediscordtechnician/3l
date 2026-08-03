@@ -123,6 +123,7 @@
   align-items: center;
   border-bottom: 3px solid var(--dusty-mauve);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  gap: 16px;
 }
 
 .header-left {
@@ -140,6 +141,12 @@
   font-size: 14px;
   margin: 0;
   color: white;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .header-right {
