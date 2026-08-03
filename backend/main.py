@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -6,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(title="3L Academic Hub", version="1.0.0")
+print("✓ FastAPI app created")
 
 origins = [
     "http://localhost:3000",
@@ -24,10 +28,14 @@ app.add_middleware(
 )
 
 try:
+    print("Loading auth router...")
     from routes.auth import router as auth_router
     app.include_router(auth_router)
+    print("✓ Auth router loaded")
 except Exception as e:
-    print(f"Warning: Could not load auth router: {e}")
+    print(f"✗ Warning: Could not load auth router: {e}")
+    import traceback
+    traceback.print_exc()
 
 try:
     from routes.classes import router as classes_router
@@ -94,3 +102,7 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+@app.get("/ping")
+def ping():
+    return {"pong": True}
