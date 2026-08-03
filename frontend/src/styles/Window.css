@@ -1,0 +1,84 @@
+.window {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--powder-petal);
+  border: 3px solid var(--dusty-mauve);
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.1),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  user-select: none;
+}
+
+.window-header {
+  background: linear-gradient(90deg, var(--cherry-blossom) 0%, var(--pastel-pink) 100%);
+  color: white;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--dusty-mauve);
+  font-size: 11px;
+  font-family: 'Press Start 2P', cursive;
+}
+
+.window-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.window-close-btn {
+  background-color: var(--dusty-mauve);
+  border: 1px solid #fff;
+  color: white;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Press Start 2P', cursive;
+  margin-left: 6px;
+  flex-shrink: 0;
+  transition: all 0.1s ease;
+}
+
+.window-close-btn:hover {
+  background-color: var(--cherry-blossom);
+  transform: scale(1.1);
+}
+
+.window-close-btn:active {
+  transform: scale(0.95);
+}
+
+.window-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+}
+
+/* Custom scrollbar for windows */
+.window-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.window-content::-webkit-scrollbar-track {
+  background: var(--powder-petal);
+  border: 1px solid var(--dusty-mauve);
+}
+
+.window-content::-webkit-scrollbar-thumb {
+  background: var(--pastel-pink);
+  border: 1px solid var(--dusty-mauve);
+}
+
+.window-content::-webkit-scrollbar-thumb:hover {
+  background: var(--cherry-blossom);
+}
