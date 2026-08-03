@@ -18,7 +18,10 @@ from auth import get_password_hash
 
 load_dotenv()
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not create tables: {e}")
 
 def create_default_user():
     db = SessionLocal()
@@ -68,10 +71,13 @@ app.include_router(setup_router)
 @app.on_event("startup")
 async def startup_event():
     print("🚀 Starting 3L Academic Hub...")
-    if not verify_database_connection():
-        print("⚠️  WARNING: Database connection check failed")
-        print("Make sure DATABASE_URL environment variable is set correctly")
-    create_default_user()
+    try:
+        if not verify_database_connection():
+            print("⚠️  WARNING: Database connection check failed")
+            print("Make sure DATABASE_URL environment variable is set correctly")
+        create_default_user()
+    except Exception as e:
+        print(f"⚠️  Warning during startup: {e}")
     print("✓ 3L Academic Hub is running!")
 
 @app.get("/")
