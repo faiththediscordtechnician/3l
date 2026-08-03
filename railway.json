@@ -10,10 +10,10 @@
     "restartPolicyMaxRetries": 5,
     "restartPolicyType": "on_failure",
     "healthCheck": {
-      "intervalSeconds": 10,
-      "timeoutSeconds": 5,
+      "intervalSeconds": 30,
+      "timeoutSeconds": 30,
       "successThreshold": 1,
-      "failureThreshold": 3
+      "failureThreshold": 10
     }
   }
 }
