@@ -1,0 +1,130 @@
+.setup-wizard {
+  padding: 20px;
+  color: var(--dusty-mauve);
+}
+
+.setup-step h2 {
+  font-size: 14px;
+  margin: 0 0 12px 0;
+  color: var(--dusty-mauve);
+  text-align: center;
+}
+
+.setup-step p {
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+.setup-info {
+  background-color: var(--pastel-pink);
+  border: 2px solid var(--dusty-mauve);
+  padding: 12px;
+  margin: 16px 0;
+  border-radius: 4px;
+}
+
+.setup-info h3 {
+  font-size: 11px;
+  margin: 0 0 8px 0;
+  color: var(--dusty-mauve);
+}
+
+.setup-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.setup-info li {
+  font-size: 10px;
+  margin: 6px 0;
+  color: var(--dusty-mauve);
+  padding-left: 12px;
+  position: relative;
+}
+
+.setup-info li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--cherry-blossom);
+}
+
+.setup-btn {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 2px solid var(--dusty-mauve);
+  background-color: var(--pastel-pink);
+  color: var(--dusty-mauve);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', cursive;
+  transition: all 0.1s ease;
+}
+
+.setup-btn:hover:not(:disabled) {
+  background-color: var(--cherry-blossom);
+  transform: scale(1.05);
+}
+
+.setup-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.setup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.setup-btn-primary {
+  background-color: var(--cherry-blossom);
+  margin-top: 16px;
+}
+
+.created-classes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.class-badge {
+  background: linear-gradient(135deg, var(--cherry-blossom), var(--pastel-pink));
+  border: 2px solid var(--dusty-mauve);
+  padding: 12px;
+  border-radius: 4px;
+  color: white;
+}
+
+.class-badge strong {
+  font-size: 11px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.class-badge p {
+  font-size: 10px;
+  margin: 4px 0;
+  text-align: left;
+  color: white;
+}
+
+.class-badge small {
+  font-size: 9px;
+  display: block;
+  opacity: 0.9;
+  color: white;
+}
+
+.setup-hint {
+  background-color: var(--powder-petal);
+  border: 1px solid var(--dusty-mauve);
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-style: italic;
+  margin: 12px 0;
+}

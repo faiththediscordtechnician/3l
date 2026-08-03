@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { auth, setAuthToken, getAuthToken } from './utils/api'
+import { auth, setAuthToken, getAuthToken, setup } from './utils/api'
 import { syncManager } from './utils/syncManager'
 import { Window } from './components/Window'
 import { Mascot } from './components/Mascot'
 import { SyncIndicator } from './components/SyncIndicator'
+import { SetupWizard } from './components/SetupWizard'
 import './App.css'
 
 function App() {
@@ -16,13 +17,29 @@ function App() {
   const [windows, setWindows] = useState({
     dashboard: { open: true, title: '3L ACADEMIC HUB' },
   })
+  const [showSetup, setShowSetup] = useState(false)
+  const [setupChecked, setSetupChecked] = useState(false)
 
   useEffect(() => {
     if (isLoggedIn) {
       syncManager.startAutoSync(5000)
+      checkSetupStatus()
       return () => syncManager.stopAutoSync()
     }
   }, [isLoggedIn])
+
+  const checkSetupStatus = async () => {
+    try {
+      const status = await setup.getStatus()
+      if (!status.is_setup) {
+        setShowSetup(true)
+      }
+      setSetupChecked(true)
+    } catch (error) {
+      console.error('Failed to check setup:', error)
+      setSetupChecked(true)
+    }
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -142,6 +159,10 @@ function App() {
       </div>
 
       <div className="windows-container">
+        {showSetup && setupChecked && (
+          <SetupWizard onComplete={() => setShowSetup(false)} />
+        )}
+
         {windows.dashboard?.open && (
           <Window
             id="dashboard"

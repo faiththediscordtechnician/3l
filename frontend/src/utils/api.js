@@ -115,3 +115,8 @@ export const exportData = {
   readingPdf: (readingId) => apiCall('GET', `/export/reading/${readingId}/pdf`, null, { headers: {} }),
   classMarkdown: (classId) => apiCall('GET', `/export/class/${classId}/markdown`, null, { headers: {} }),
 }
+
+export const setup = {
+  seedClasses: () => apiCall('POST', '/setup/seed-classes', {}),
+  getStatus: () => apiCall('GET', '/setup/status'),
+}

@@ -11,6 +11,7 @@ from routes.search import router as search_router
 from routes.annotations import router as annotations_router
 from routes.export import router as export_router
 from routes.sync import router as sync_router
+from routes.setup import router as setup_router
 from models import Base, User
 from database import engine, SessionLocal, verify_database_connection
 from auth import get_password_hash
@@ -62,6 +63,7 @@ app.include_router(search_router)
 app.include_router(annotations_router)
 app.include_router(export_router)
 app.include_router(sync_router)
+app.include_router(setup_router)
 
 @app.on_event("startup")
 def startup_event():
