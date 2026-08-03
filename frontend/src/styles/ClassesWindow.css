@@ -1,0 +1,85 @@
+.classes-window {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.classes-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 200px;
+}
+
+.class-item {
+  background-color: var(--pastel-pink);
+  border: 2px solid var(--dusty-mauve);
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.class-item:hover {
+  background-color: var(--cherry-blossom);
+  transform: scale(1.02);
+}
+
+.class-item h3 {
+  font-size: 12px;
+  margin: 0 0 4px 0;
+  color: var(--dusty-mauve);
+}
+
+.class-item p {
+  font-size: 10px;
+  margin: 0;
+  color: var(--dusty-mauve);
+  opacity: 0.7;
+}
+
+.add-class-form {
+  border-top: 2px solid var(--dusty-mauve);
+  padding-top: 12px;
+}
+
+.add-class-form h4 {
+  font-size: 11px;
+  margin: 0 0 8px 0;
+  color: var(--dusty-mauve);
+}
+
+.add-class-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-class-form input {
+  padding: 6px;
+  border: 2px solid var(--dusty-mauve);
+  background-color: var(--powder-petal);
+  color: var(--dusty-mauve);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 9px;
+}
+
+.add-class-form button {
+  padding: 6px;
+  background-color: var(--pastel-pink);
+  border: 2px solid var(--dusty-mauve);
+  color: var(--dusty-mauve);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.add-class-form button:hover {
+  background-color: var(--cherry-blossom);
+  transform: scale(1.05);
+}
+
+.add-class-form button:active {
+  transform: scale(0.95);
+}

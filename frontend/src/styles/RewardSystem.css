@@ -1,0 +1,128 @@
+.reward-system {
+  padding: 12px;
+  background-color: var(--powder-petal);
+  border: 2px solid var(--dusty-mauve);
+}
+
+.milestone-tracker {
+  margin-bottom: 12px;
+}
+
+.milestone-bar {
+  width: 100%;
+  height: 16px;
+  background-color: var(--pastel-pink);
+  border: 1px solid var(--dusty-mauve);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.milestone-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cherry-blossom), var(--bright-gold));
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.word-count {
+  font-size: 10px;
+  text-align: center;
+  color: var(--dusty-mauve);
+  margin: 0;
+}
+
+.achievements {
+  display: flex;
+  justify-content: space-around;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.achievement {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: 2px solid var(--dusty-mauve);
+  background-color: var(--pastel-pink);
+  border-radius: 4px;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.achievement.unlocked {
+  opacity: 1;
+  background-color: var(--cherry-blossom);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+  animation: achievement-unlock 0.6s ease-out;
+}
+
+@keyframes achievement-unlock {
+  0% {
+    transform: scale(0.5) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.celebration-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  animation: celebration-appear 1s ease-out;
+}
+
+.popup-content {
+  background-color: var(--cherry-blossom);
+  border: 3px solid var(--dusty-mauve);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.popup-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+  animation: confetti-spin 0.6s ease-out;
+}
+
+.popup-content p {
+  font-size: 12px;
+  color: white;
+  margin: 0;
+}
+
+@keyframes celebration-appear {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes confetti-spin {
+  0% {
+    transform: rotate(-180deg) scale(0);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
