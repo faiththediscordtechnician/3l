@@ -66,8 +66,13 @@ app.include_router(sync_router)
 app.include_router(setup_router)
 
 @app.on_event("startup")
-def startup_event():
+async def startup_event():
+    print("🚀 Starting 3L Academic Hub...")
+    if not verify_database_connection():
+        print("⚠️  WARNING: Database connection check failed")
+        print("Make sure DATABASE_URL environment variable is set correctly")
     create_default_user()
+    print("✓ 3L Academic Hub is running!")
 
 @app.get("/")
 def read_root():
