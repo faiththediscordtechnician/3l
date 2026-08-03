@@ -2,42 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
-from routes.auth import router as auth_router
-from routes.classes import router as classes_router
-from routes.readings import router as readings_router
-from routes.notes import router as notes_router
-from routes.todos import router as todos_router
-from routes.search import router as search_router
-from routes.annotations import router as annotations_router
-from routes.export import router as export_router
-from routes.sync import router as sync_router
-from routes.setup import router as setup_router
-from models import Base, User
-from database import engine, SessionLocal, verify_database_connection
-from auth import get_password_hash
 
 load_dotenv()
-
-try:
-    Base.metadata.create_all(bind=engine)
-except Exception as e:
-    print(f"Warning: Could not create tables: {e}")
-
-def create_default_user():
-    db = SessionLocal()
-    try:
-        admin_user = db.query(User).filter(User.username == "admin").first()
-        if not admin_user:
-            hashed_password = get_password_hash("admin123")
-            admin_user = User(username="admin", password_hash=hashed_password)
-            db.add(admin_user)
-            db.commit()
-            print("✓ Default admin user created")
-    except Exception as e:
-        print(f"✗ Error creating default user: {e}")
-        db.rollback()
-    finally:
-        db.close()
 
 app = FastAPI(title="3L Academic Hub", version="1.0.0")
 
@@ -57,25 +23,93 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router)
-app.include_router(classes_router)
-app.include_router(readings_router)
-app.include_router(notes_router)
-app.include_router(todos_router)
-app.include_router(search_router)
-app.include_router(annotations_router)
-app.include_router(export_router)
-app.include_router(sync_router)
-app.include_router(setup_router)
+try:
+    from routes.auth import router as auth_router
+    app.include_router(auth_router)
+except Exception as e:
+    print(f"Warning: Could not load auth router: {e}")
+
+try:
+    from routes.classes import router as classes_router
+    app.include_router(classes_router)
+except Exception as e:
+    print(f"Warning: Could not load classes router: {e}")
+
+try:
+    from routes.readings import router as readings_router
+    app.include_router(readings_router)
+except Exception as e:
+    print(f"Warning: Could not load readings router: {e}")
+
+try:
+    from routes.notes import router as notes_router
+    app.include_router(notes_router)
+except Exception as e:
+    print(f"Warning: Could not load notes router: {e}")
+
+try:
+    from routes.todos import router as todos_router
+    app.include_router(todos_router)
+except Exception as e:
+    print(f"Warning: Could not load todos router: {e}")
+
+try:
+    from routes.search import router as search_router
+    app.include_router(search_router)
+except Exception as e:
+    print(f"Warning: Could not load search router: {e}")
+
+try:
+    from routes.annotations import router as annotations_router
+    app.include_router(annotations_router)
+except Exception as e:
+    print(f"Warning: Could not load annotations router: {e}")
+
+try:
+    from routes.export import router as export_router
+    app.include_router(export_router)
+except Exception as e:
+    print(f"Warning: Could not load export router: {e}")
+
+try:
+    from routes.sync import router as sync_router
+    app.include_router(sync_router)
+except Exception as e:
+    print(f"Warning: Could not load sync router: {e}")
+
+try:
+    from routes.setup import router as setup_router
+    app.include_router(setup_router)
+except Exception as e:
+    print(f"Warning: Could not load setup router: {e}")
 
 @app.on_event("startup")
 async def startup_event():
     print("🚀 Starting 3L Academic Hub...")
     try:
+        from database import verify_database_connection
+        from models import Base, User
+        from database import engine, SessionLocal
+        from auth import get_password_hash
+
+        Base.metadata.create_all(bind=engine)
+
         if not verify_database_connection():
             print("⚠️  WARNING: Database connection check failed")
-            print("Make sure DATABASE_URL environment variable is set correctly")
-        create_default_user()
+
+        db = SessionLocal()
+        try:
+            admin_user = db.query(User).filter(User.username == "admin").first()
+            if not admin_user:
+                hashed_password = get_password_hash("admin123")
+                admin_user = User(username="admin", password_hash=hashed_password)
+                db.add(admin_user)
+                db.commit()
+                print("✓ Default admin user created")
+        except Exception as e:
+            print(f"⚠️  Warning creating default user: {e}")
+        finally:
+            db.close()
     except Exception as e:
         print(f"⚠️  Warning during startup: {e}")
     print("✓ 3L Academic Hub is running!")
