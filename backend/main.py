@@ -85,34 +85,7 @@ except Exception as e:
 
 @app.on_event("startup")
 async def startup_event():
-    print("🚀 Starting 3L Academic Hub...")
-    try:
-        from database import verify_database_connection
-        from models import Base, User
-        from database import engine, SessionLocal
-        from auth import get_password_hash
-
-        Base.metadata.create_all(bind=engine)
-
-        if not verify_database_connection():
-            print("⚠️  WARNING: Database connection check failed")
-
-        db = SessionLocal()
-        try:
-            admin_user = db.query(User).filter(User.username == "admin").first()
-            if not admin_user:
-                hashed_password = get_password_hash("admin123")
-                admin_user = User(username="admin", password_hash=hashed_password)
-                db.add(admin_user)
-                db.commit()
-                print("✓ Default admin user created")
-        except Exception as e:
-            print(f"⚠️  Warning creating default user: {e}")
-        finally:
-            db.close()
-    except Exception as e:
-        print(f"⚠️  Warning during startup: {e}")
-    print("✓ 3L Academic Hub is running!")
+    print("🚀 3L Academic Hub starting...")
 
 @app.get("/")
 def read_root():
