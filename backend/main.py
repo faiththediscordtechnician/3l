@@ -37,6 +37,36 @@ try:
 except Exception as e:
     print(f"Warning: Todos router failed: {e}")
 
+try:
+    from routes.search import router as search_router
+    app.include_router(search_router)
+except Exception as e:
+    print(f"Warning: Search router failed: {e}")
+
+try:
+    from routes.annotations import router as annotations_router
+    app.include_router(annotations_router)
+except Exception as e:
+    print(f"Warning: Annotations router failed: {e}")
+
+try:
+    from routes.export import router as export_router
+    app.include_router(export_router)
+except Exception as e:
+    print(f"Warning: Export router failed: {e}")
+
+try:
+    from routes.sync import router as sync_router
+    app.include_router(sync_router)
+except Exception as e:
+    print(f"Warning: Sync router failed: {e}")
+
+try:
+    from routes.setup import router as setup_router
+    app.include_router(setup_router)
+except Exception as e:
+    print(f"Warning: Setup router failed: {e}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
