@@ -6,6 +6,13 @@ load_dotenv()
 
 app = FastAPI(title="3L Academic Hub", version="1.0.0")
 
+# Import and register auth router (core functionality)
+try:
+    from routes.auth import router as auth_router
+    app.include_router(auth_router)
+except Exception as e:
+    print(f"Warning: Auth router failed to load: {e}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
