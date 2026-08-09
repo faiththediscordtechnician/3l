@@ -1,10 +1,20 @@
+import sys
+print("Starting application initialization...", file=sys.stderr)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-load_dotenv()
+print("Loading environment variables...", file=sys.stderr)
+try:
+    load_dotenv()
+    print("Environment variables loaded", file=sys.stderr)
+except Exception as e:
+    print(f"Error loading environment variables: {e}", file=sys.stderr)
 
+print("Creating FastAPI app...", file=sys.stderr)
 app = FastAPI(title="3L Academic Hub", version="1.0.0")
+print("FastAPI app created", file=sys.stderr)
 
 # Import and register routers
 try:
@@ -67,6 +77,9 @@ try:
 except Exception as e:
     print(f"Warning: Setup router failed: {e}")
 
+print("All routers loaded", file=sys.stderr)
+
+print("Adding CORS middleware...", file=sys.stderr)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -74,6 +87,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+print("Middleware added", file=sys.stderr)
 
 @app.get("/")
 def read_root():
@@ -86,3 +100,5 @@ def health_check():
 @app.get("/ping")
 def ping():
     return {"pong": True}
+
+print("Application initialized successfully!", file=sys.stderr)
