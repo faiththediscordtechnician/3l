@@ -7,7 +7,12 @@
   },
   "deploy": {
     "startCommand": "sh -c 'exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}'",
-    "restartPolicyMaxRetries": 5,
-    "restartPolicyType": "on_failure"
+    "healthCheck": {
+      "command": ["curl", "-f", "http://localhost:${PORT:-8000}/health"],
+      "interval": 10,
+      "timeout": 5,
+      "retries": 3,
+      "startPeriod": 10
+    }
   }
 }
