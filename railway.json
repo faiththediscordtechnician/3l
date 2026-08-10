@@ -3,5 +3,9 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile.backend"
+  },
+  "deploy": {
+    "port": 8080,
+    "healthcheckPath": "/health"
   }
 }
