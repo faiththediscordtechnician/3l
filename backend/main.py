@@ -3,6 +3,8 @@ import sys
 import os
 
 print("Loading main.py...", file=sys.stderr, flush=True)
+print(f"DEBUG: PORT env var = {os.getenv('PORT', 'NOT SET')}", file=sys.stderr, flush=True)
+print(f"DEBUG: All env vars: {dict(os.environ)}", file=sys.stderr, flush=True)
 
 app = FastAPI(title="3L Academic Hub", version="1.0.0")
 
