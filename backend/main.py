@@ -102,7 +102,12 @@ app.add_middleware(
 
 print("FastAPI app created", file=sys.stderr, flush=True)
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("✓ Database tables created", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"⚠ Could not create database tables: {e}", file=sys.stderr, flush=True)
+    print("App will continue without database initialization", file=sys.stderr, flush=True)
 
 app.include_router(auth_router)
 app.include_router(classes_router)
