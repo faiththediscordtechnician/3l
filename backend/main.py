@@ -7,22 +7,89 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database import Base, engine, verify_database_connection
-from routes.auth import router as auth_router
-from routes.classes import router as classes_router
-from routes.readings import router as readings_router
-from routes.notes import router as notes_router
-from routes.todos import router as todos_router
-from routes.search import router as search_router
-from routes.annotations import router as annotations_router
-from routes.export import router as export_router
-from routes.sync import router as sync_router
-from routes.setup import router as setup_router
+
+print("Importing routers...", file=sys.stderr, flush=True)
+try:
+    from routes.auth import router as auth_router
+    print("✓ auth router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import auth router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.classes import router as classes_router
+    print("✓ classes router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import classes router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.readings import router as readings_router
+    print("✓ readings router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import readings router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.notes import router as notes_router
+    print("✓ notes router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import notes router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.todos import router as todos_router
+    print("✓ todos router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import todos router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.search import router as search_router
+    print("✓ search router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import search router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.annotations import router as annotations_router
+    print("✓ annotations router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import annotations router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.export import router as export_router
+    print("✓ export router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import export router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.sync import router as sync_router
+    print("✓ sync router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import sync router: {e}", file=sys.stderr, flush=True)
+    raise
+
+try:
+    from routes.setup import router as setup_router
+    print("✓ setup router imported", file=sys.stderr, flush=True)
+except Exception as e:
+    print(f"✗ Failed to import setup router: {e}", file=sys.stderr, flush=True)
+    raise
+
+print("All routers imported successfully", file=sys.stderr, flush=True)
 
 load_dotenv()
 
 print("Loading main.py...", file=sys.stderr, flush=True)
 
-app = FastAPI(title="3L Academic Hub", version="1.0.0")
+try:
+    app = FastAPI(title="3L Academic Hub", version="1.0.0")
+except Exception as e:
+    print(f"ERROR creating FastAPI app: {e}", file=sys.stderr, flush=True)
+    raise
 
 app.add_middleware(
     CORSMiddleware,
