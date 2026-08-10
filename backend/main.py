@@ -6,7 +6,8 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from database import Base, engine, verify_database_connection
+from database import engine, verify_database_connection
+from models import Base
 
 print("Importing routers...", file=sys.stderr, flush=True)
 try:
