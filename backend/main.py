@@ -120,7 +120,7 @@ app.include_router(export_router)
 app.include_router(sync_router)
 app.include_router(setup_router)
 
-def create_test_user():
+def create_admin_user():
     from database import SessionLocal
     from models import User
     from auth import get_password_hash
@@ -129,16 +129,16 @@ def create_test_user():
     try:
         existing_user = db.query(User).filter(User.username == "marie").first()
         if existing_user:
-            print("✓ Test user 'marie' already exists", file=sys.stderr, flush=True)
+            print("✓ Admin user 'marie' already exists", file=sys.stderr, flush=True)
             return
 
         hashed_password = get_password_hash("jdorbust")
         new_user = User(username="marie", password_hash=hashed_password)
         db.add(new_user)
         db.commit()
-        print("✓ Test user 'marie' created successfully", file=sys.stderr, flush=True)
+        print("✓ Admin user 'marie' created successfully", file=sys.stderr, flush=True)
     except Exception as e:
-        print(f"✗ Error creating test user: {e}", file=sys.stderr, flush=True)
+        print(f"✗ Error creating admin user: {e}", file=sys.stderr, flush=True)
         import traceback
         traceback.print_exc(file=sys.stderr)
         db.rollback()
@@ -152,7 +152,7 @@ async def startup():
     if not verify_database_connection():
         print("⚠ Database connection failed but app will continue", file=sys.stderr, flush=True)
     else:
-        create_test_user()
+        create_admin_user()
 
 @app.get("/")
 def read_root():
