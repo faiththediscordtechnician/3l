@@ -1,8 +1,14 @@
 export function CharacterJumping() {
   return (
     <svg className="character-jumping" viewBox="0 0 220 300" xmlns="http://www.w3.org/2000/svg">
+      {/* Hair back */}
+      <path d="M 70 50 Q 60 40 65 15 Q 75 5 100 8 Q 125 5 135 15 Q 140 40 130 50" stroke="#d4a574" strokeWidth="10" fill="none" strokeLinecap="round"/>
+      {/* Hair bangs (front) */}
+      <path d="M 80 40 Q 85 25 90 35" stroke="#d4a574" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      <path d="M 100 35 Q 100 20 100 35" stroke="#d4a574" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      <path d="M 120 40 Q 115 25 110 35" stroke="#d4a574" strokeWidth="6" fill="none" strokeLinecap="round"/>
       {/* Hair (flowing down, sideways view) */}
-      <path d="M 80 50 Q 70 45 70 25 Q 70 15 90 12 Q 110 10 115 15 L 115 60" stroke="#d4a574" strokeWidth="9" fill="none" strokeLinecap="round"/>
+      <path d="M 75 50 Q 70 80 75 130 Q 78 160 82 190" stroke="#d4a574" strokeWidth="9" fill="none" strokeLinecap="round"/>
       <path d="M 75 60 Q 70 100 75 140 Q 78 170 82 200" stroke="#d4a574" strokeWidth="8" fill="none" strokeLinecap="round"/>
       <path d="M 85 65 Q 82 110 88 150 Q 92 185 95 220" stroke="#d4a574" strokeWidth="7" fill="none" strokeLinecap="round"/>
 
