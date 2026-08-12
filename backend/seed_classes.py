@@ -43,23 +43,23 @@ CLASSES = [
 def seed_classes():
     db = SessionLocal()
     try:
-        # Get the admin user
-        admin_user = db.query(User).filter(User.username == "admin").first()
-        if not admin_user:
-            print("✗ Admin user not found. Please create the admin user first.")
+        # Get the marie user
+        marie_user = db.query(User).filter(User.username == "marie").first()
+        if not marie_user:
+            print("✗ Marie user not found. Please create the marie user first.")
             return
 
         # Check if classes already exist
-        existing_classes = db.query(Class).filter(Class.user_id == admin_user.id).count()
+        existing_classes = db.query(Class).filter(Class.user_id == marie_user.id).count()
         if existing_classes > 0:
-            print(f"✓ {existing_classes} classes already exist for admin user")
+            print(f"✓ {existing_classes} classes already exist for marie")
             print("Skipping seed (to re-seed, delete existing classes first)")
             return
 
         # Create classes
         for class_data in CLASSES:
             new_class = Class(
-                user_id=admin_user.id,
+                user_id=marie_user.id,
                 name=class_data["name"],
                 code=class_data["code"],
                 instructor=class_data["instructor"],
