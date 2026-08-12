@@ -57,3 +57,24 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
 def debug_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return {"users": [{"id": u.id, "username": u.username} for u in users]}
+
+@router.post("/debug/create-test-user")
+def create_test_user_endpoint(db: Session = Depends(get_db)):
+    try:
+        existing_user = db.query(User).filter(User.username == "marie").first()
+        if existing_user:
+            return {"status": "User already exists", "user_id": existing_user.id}
+
+        hashed_password = get_password_hash("jdorbust")
+        new_user = User(username="marie", password_hash=hashed_password)
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        print(f"✓ Test user created via endpoint: ID {new_user.id}", file=sys.stderr, flush=True)
+        return {"status": "User created successfully", "user_id": new_user.id, "username": "marie"}
+    except Exception as e:
+        print(f"✗ Error creating user: {e}", file=sys.stderr, flush=True)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
