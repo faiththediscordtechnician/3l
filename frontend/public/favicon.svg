@@ -1,0 +1,27 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for visibility -->
+  <circle cx="50" cy="50" r="48" fill="#f5f0f8" stroke="#c9b3d5" stroke-width="2"/>
+
+  <!-- Gavel handle (Navy) -->
+  <rect x="47" y="50" width="6" height="35" fill="#001f3f" rx="2"/>
+
+  <!-- Gavel head/block (Navy) -->
+  <rect x="35" y="42" width="30" height="10" fill="#001f3f" rx="1"/>
+
+  <!-- Sound block lines (detail) -->
+  <line x1="40" y1="42" x2="40" y2="52" stroke="#c9b3d5" stroke-width="0.5"/>
+  <line x1="45" y1="42" x2="45" y2="52" stroke="#c9b3d5" stroke-width="0.5"/>
+  <line x1="55" y1="42" x2="55" y2="52" stroke="#c9b3d5" stroke-width="0.5"/>
+  <line x1="60" y1="42" x2="60" y2="52" stroke="#c9b3d5" stroke-width="0.5"/>
+
+  <!-- Mallet ball (Maroon) - striking the gavel -->
+  <circle cx="65" cy="38" r="8" fill="#800020"/>
+
+  <!-- Mallet shaft connecting to ball (Maroon) -->
+  <line x1="65" y1="38" x2="65" y2="48" stroke="#800020" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Gold accent spark -->
+  <circle cx="60" cy="30" r="1.5" fill="#ffd700"/>
+  <circle cx="70" cy="32" r="1" fill="#ffd700"/>
+  <circle cx="68" cy="25" r="1.2" fill="#ffd700"/>
+</svg>

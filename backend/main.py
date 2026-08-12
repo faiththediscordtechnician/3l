@@ -127,6 +127,24 @@ async def startup():
     if not verify_database_connection():
         print("⚠ Database connection failed but app will continue", file=sys.stderr, flush=True)
 
+    from database import SessionLocal
+    from models import User
+    from auth import get_password_hash
+
+    db = SessionLocal()
+    try:
+        existing_user = db.query(User).filter(User.username == "marie").first()
+        if not existing_user:
+            hashed_password = get_password_hash("jdorbust")
+            new_user = User(username="marie", password_hash=hashed_password)
+            db.add(new_user)
+            db.commit()
+            print("✓ Test user 'marie' created", file=sys.stderr, flush=True)
+    except Exception as e:
+        print(f"⚠ Could not create test user: {e}", file=sys.stderr, flush=True)
+    finally:
+        db.close()
+
 @app.get("/")
 def read_root():
     return {"message": "3L Academic Hub API is running", "version": "1.0.0"}
