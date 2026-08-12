@@ -9,8 +9,8 @@ import './App.css'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!getAuthToken())
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('admin123')
+  const [username, setUsername] = useState('marie')
+  const [password, setPassword] = useState('jdorbust')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [mascotState, setMascotState] = useState('idle')
@@ -134,7 +134,7 @@ function App() {
               </button>
             </form>
 
-            <p className="login-hint">Default: admin / admin123</p>
+            <p className="login-hint">✧ Press START! Try: marie / jdorbust ✧</p>
           </div>
         </div>
       </div>
