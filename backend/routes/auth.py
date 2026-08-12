@@ -29,7 +29,17 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=Token)
 def login(user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.username == user.username).first()
-    if not db_user or not verify_password(user.password, db_user.password_hash):
+    if not db_user:
+        print(f"User '{user.username}' not found in database", file=sys.stderr, flush=True)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    password_valid = verify_password(user.password, db_user.password_hash)
+    if not password_valid:
+        print(f"Password verification failed for user '{user.username}'", file=sys.stderr, flush=True)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -40,4 +50,10 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": db_user.username}, expires_delta=access_token_expires
     )
+    print(f"Login successful for user '{user.username}'", file=sys.stderr, flush=True)
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/debug/users")
+def debug_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return {"users": [{"id": u.id, "username": u.username} for u in users]}
