@@ -65,7 +65,7 @@ def create_test_user_endpoint(db: Session = Depends(get_db)):
         if existing_user:
             return {"status": "User already exists", "user_id": existing_user.id}
 
-        hashed_password = get_password_hash("jdorbust")
+        hashed_password = get_password_hash("marie123")
         new_user = User(username="marie", password_hash=hashed_password)
         db.add(new_user)
         db.commit()

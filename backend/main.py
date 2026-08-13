@@ -132,7 +132,7 @@ def create_admin_user():
             print("✓ Admin user 'marie' already exists", file=sys.stderr, flush=True)
             return
 
-        hashed_password = get_password_hash("jdorbust")
+        hashed_password = get_password_hash("marie123")
         new_user = User(username="marie", password_hash=hashed_password)
         db.add(new_user)
         db.commit()

@@ -10,7 +10,7 @@ import './App.css'
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!getAuthToken())
   const [username, setUsername] = useState('marie')
-  const [password, setPassword] = useState('jdorbust')
+  const [password, setPassword] = useState('marie123')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [mascotState, setMascotState] = useState('idle')
@@ -134,7 +134,7 @@ function App() {
               </button>
             </form>
 
-            <p className="login-hint">✧ Press START! Try: marie / jdorbust ✧</p>
+            <p className="login-hint">✧ Press START! Try: marie / marie123 ✧</p>
           </div>
         </div>
       </div>
