@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { auth, setAuthToken, getAuthToken, setup } from './utils/api'
+import { auth, setAuthToken, getAuthToken, setup, classes } from './utils/api'
 import { syncManager } from './utils/syncManager'
 import { Window } from './components/Window'
 import { Mascot } from './components/Mascot'
@@ -14,6 +14,7 @@ function App() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [mascotState, setMascotState] = useState('idle')
+  const [todaysClasses, setTodaysClasses] = useState([])
   const [windows, setWindows] = useState({
     dashboard: { open: true, title: '3L ACADEMIC HUB' },
   })
@@ -24,6 +25,7 @@ function App() {
     if (isLoggedIn) {
       syncManager.startAutoSync(5000)
       checkSetupStatus()
+      fetchTodaysClasses()
       return () => syncManager.stopAutoSync()
     }
   }, [isLoggedIn])
@@ -38,6 +40,15 @@ function App() {
     } catch (error) {
       console.error('Failed to check setup:', error)
       setSetupChecked(true)
+    }
+  }
+
+  const fetchTodaysClasses = async () => {
+    try {
+      const classesData = await classes.today()
+      setTodaysClasses(classesData)
+    } catch (error) {
+      console.error('Failed to fetch todays classes:', error)
     }
   }
 
@@ -163,6 +174,64 @@ function App() {
           <SetupWizard onComplete={() => setShowSetup(false)} />
         )}
 
+        {Object.entries(windows).map(([windowId, windowData]) => {
+          if (windowId.startsWith('class-') && windowData.open && windowData.classData) {
+            const classData = windowData.classData
+            return (
+              <Window
+                key={windowId}
+                id={windowId}
+                title={windowData.title}
+                onClose={() => closeWindow(windowId)}
+                zIndex={50}
+              >
+                <div className="class-detail-content">
+                  <div className="class-detail-header">
+                    <div className="class-detail-code">{classData.code}</div>
+                    <div className="class-detail-name">{classData.name}</div>
+                  </div>
+
+                  <div className="class-detail-info">
+                    <div className="info-row">
+                      <span className="info-label">⏰ Time:</span>
+                      <span className="info-value">{classData.start_time} - {classData.end_time}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">👨‍🏫 Instructor:</span>
+                      <span className="info-value">{classData.instructor}</span>
+                    </div>
+                    {classData.room && (
+                      <div className="info-row">
+                        <span className="info-label">📍 Location:</span>
+                        <span className="info-value">{classData.room}</span>
+                      </div>
+                    )}
+                    {classData.day_of_week && (
+                      <div className="info-row">
+                        <span className="info-label">📅 Day:</span>
+                        <span className="info-value">{classData.day_of_week}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="class-detail-actions">
+                    <button className="action-btn">NEW READING</button>
+                    <button className="action-btn">NEW TODO</button>
+                  </div>
+
+                  {classData.notes && (
+                    <div className="class-detail-notes">
+                      <h3>Notes:</h3>
+                      <p>{classData.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </Window>
+            )
+          }
+          return null
+        })}
+
         {windows.dashboard?.open && (
           <Window
             id="dashboard"
@@ -171,17 +240,44 @@ function App() {
             zIndex={100}
           >
             <div className="dashboard-content">
-              <h2>Your Classes</h2>
-              <p>Classes section coming soon...</p>
+              <h2>📅 Today's Classes</h2>
+              {todaysClasses.length > 0 ? (
+                <div className="todays-classes">
+                  {todaysClasses.map((classItem) => (
+                    <div
+                      key={classItem.id}
+                      className="class-card clickable"
+                      onClick={() => {
+                        setWindows((prev) => ({
+                          ...prev,
+                          [`class-${classItem.id}`]: {
+                            open: true,
+                            title: classItem.code,
+                            classData: classItem,
+                          },
+                        }))
+                      }}
+                    >
+                      <div className="class-time">
+                        {classItem.start_time} - {classItem.end_time}
+                      </div>
+                      <div className="class-name">{classItem.code}</div>
+                      <div className="class-title">{classItem.name}</div>
+                      <div className="class-instructor">{classItem.instructor}</div>
+                      {classItem.room && (
+                        <div className="class-room">📍 {classItem.room}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-classes">No classes today! 🎉</p>
+              )}
 
               <div className="quick-actions">
-                <button className="action-btn">NEW CLASS</button>
                 <button className="action-btn">NEW READING</button>
                 <button className="action-btn">NEW TODO</button>
               </div>
-
-              <h3>Recent Activity</h3>
-              <p>No activity yet. Start by creating a class!</p>
             </div>
           </Window>
         )}

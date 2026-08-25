@@ -60,6 +60,7 @@ export const auth = {
 
 export const classes = {
   list: () => apiCall('GET', '/classes/'),
+  today: () => apiCall('GET', '/classes/today'),
   create: (classData) => apiCall('POST', '/classes/', classData),
   get: (id) => apiCall('GET', `/classes/${id}`),
   update: (id, classData) => apiCall('PUT', `/classes/${id}`, classData),
