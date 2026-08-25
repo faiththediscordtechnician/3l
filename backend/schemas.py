@@ -28,6 +28,10 @@ class ClassBase(BaseModel):
     instructor: Optional[str] = None
     notes: Optional[str] = None
     color: str = "powder-petal"
+    day_of_week: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    room: Optional[str] = None
 
 class ClassCreate(ClassBase):
     pass

@@ -26,6 +26,11 @@ class Class(Base):
     instructor = Column(String)
     notes = Column(Text)
     color = Column(String, default="powder-petal")
+    # Schedule info
+    day_of_week = Column(String)  # Monday, Tuesday, Wednesday, etc.
+    start_time = Column(String)  # HH:MM format (24-hour)
+    end_time = Column(String)    # HH:MM format (24-hour)
+    room = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="classes")
