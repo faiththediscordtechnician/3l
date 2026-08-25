@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from datetime import datetime
 import sys
 import os
 
@@ -20,7 +21,11 @@ def create_class(class_data: ClassCreate, db: Session = Depends(get_db), current
         code=class_data.code,
         instructor=class_data.instructor,
         notes=class_data.notes,
-        color=class_data.color
+        color=class_data.color,
+        day_of_week=class_data.day_of_week,
+        start_time=class_data.start_time,
+        end_time=class_data.end_time,
+        room=class_data.room
     )
     db.add(db_class)
     db.commit()
@@ -41,6 +46,17 @@ def get_class(class_id: int, db: Session = Depends(get_db), current_user: User =
         raise HTTPException(status_code=404, detail="Class not found")
     return db_class
 
+@router.get("/today", response_model=list[ClassResponse])
+def get_today_classes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    today = datetime.now().weekday()
+    today_name = days[today]
+
+    return db.query(Class).filter(
+        Class.user_id == current_user.id,
+        Class.day_of_week == today_name
+    ).all()
+
 @router.put("/{class_id}", response_model=ClassResponse)
 def update_class(class_id: int, class_data: ClassCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_class = db.query(Class).filter(
@@ -55,6 +71,10 @@ def update_class(class_id: int, class_data: ClassCreate, db: Session = Depends(g
     db_class.instructor = class_data.instructor
     db_class.notes = class_data.notes
     db_class.color = class_data.color
+    db_class.day_of_week = class_data.day_of_week
+    db_class.start_time = class_data.start_time
+    db_class.end_time = class_data.end_time
+    db_class.room = class_data.room
     db.commit()
     db.refresh(db_class)
     return db_class
