@@ -35,11 +35,6 @@ h1, h2, h3 {
 button {
   font-family: 'VT323', monospace;
   cursor: pointer;
-  transition: all 0.1s ease;
-}
-
-button:active {
-  transform: scale(0.95);
 }
 
 input, textarea {
@@ -101,13 +96,11 @@ input, textarea {
   border-radius: 4px;
   padding: 8px;
   cursor: pointer;
-  transition: all 0.1s ease;
 }
 
 .note-item:hover {
   background: #FFD4E2;
   border-color: var(--cherry-blossom);
-  transform: scale(1.02);
 }
 
 .note-item.active {
@@ -212,6 +205,7 @@ input, textarea {
   justify-content: center;
   color: var(--cherry-blossom);
   font-size: 16px;
+  cursor: pointer;
 }
 
 .icon-btn:hover {
@@ -224,6 +218,54 @@ input, textarea {
   color: white;
 }
 
+.toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: #F5F5F5;
+  border: 2px solid var(--baby-blue);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbar-btn {
+  background: var(--pink-accent);
+  border: 2px solid var(--baby-blue);
+  color: var(--cherry-blossom);
+  padding: 6px 10px;
+  font-size: 11px;
+  border-radius: 3px;
+  cursor: pointer;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-btn:hover {
+  background: #FFD4E2;
+  border-color: var(--cherry-blossom);
+}
+
+.toolbar-btn:active {
+  background: var(--cherry-blossom);
+  color: white;
+}
+
+.highlight-btn {
+  min-width: auto;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: var(--baby-blue);
+  margin: 0 4px;
+}
+
 .editor-content {
   flex: 1;
   display: flex;
@@ -231,21 +273,26 @@ input, textarea {
   min-height: 0;
 }
 
-.editor-textarea {
+.editor-richtext {
   flex: 1;
   border: 2px solid var(--baby-blue);
-  border-radius: 4px;
+  border-radius: 0 0 4px 4px;
   padding: 12px;
   font-size: 11px;
   color: var(--text-dark);
-  resize: none;
-  background: var(--pastel-pink);
+  background: white;
+  outline: none;
+  overflow-y: auto;
+  line-height: 1.6;
 }
 
-.editor-textarea:focus {
-  outline: none;
+.editor-richtext:focus {
   border-color: var(--cherry-blossom);
-  background: white;
+}
+
+.editor-richtext[contenteditable]:empty:before {
+  content: attr(placeholder);
+  color: #ccc;
 }
 
 .editor-meta {
@@ -270,10 +317,10 @@ input, textarea {
   justify-content: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+  cursor: pointer;
 }
 
 .fab:hover {
-  transform: scale(1.1);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
