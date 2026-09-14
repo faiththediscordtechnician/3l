@@ -1,287 +1,298 @@
-import { useState, useEffect } from 'react'
-import { auth, setAuthToken, getAuthToken, setup, classes } from './utils/api'
-import { syncManager } from './utils/syncManager'
-import { Window } from './components/Window'
-import { Mascot } from './components/Mascot'
-import { SyncIndicator } from './components/SyncIndicator'
-import { SetupWizard } from './components/SetupWizard'
-import './App.css'
+import { useState, useEffect, useRef } from 'react'
+import './index.css'
+
+const API_URL = import.meta.env.VITE_API_URL || '/api'
+
+function RichTextToolbar({ onBold, onItalic, onUnderline, onHighlight, onExportPDF }) {
+  return (
+    <div className="toolbar">
+      <button className="toolbar-btn" onClick={onBold} title="Bold (Ctrl+B)">
+        <strong>B</strong>
+      </button>
+      <button className="toolbar-btn" onClick={onItalic} title="Italic (Ctrl+I)">
+        <em>I</em>
+      </button>
+      <button className="toolbar-btn" onClick={onUnderline} title="Underline (Ctrl+U)">
+        <u>U</u>
+      </button>
+      <button className="toolbar-btn highlight-btn" onClick={onHighlight} title="Highlight">
+        🎨
+      </button>
+      <div className="toolbar-separator"></div>
+      <button className="toolbar-btn" onClick={onExportPDF} title="Export as PDF">
+        📄 PDF
+      </button>
+    </div>
+  )
+}
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!getAuthToken())
-  const [username, setUsername] = useState('marie')
-  const [password, setPassword] = useState('marie123')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [mascotState, setMascotState] = useState('idle')
-  const [todaysClasses, setTodaysClasses] = useState([])
-  const [windows, setWindows] = useState({
-    dashboard: { open: true, title: '3L ACADEMIC HUB' },
-  })
-  const [showSetup, setShowSetup] = useState(false)
-  const [setupChecked, setSetupChecked] = useState(false)
+  const [notes, setNotes] = useState([])
+  const [selectedNoteId, setSelectedNoteId] = useState(null)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const autoSaveTimerRef = useRef(null)
+  const editorRef = useRef(null)
 
+  const selectedNote = notes.find(n => n.id === selectedNoteId)
+
+  // Load notes from backend on mount
   useEffect(() => {
-    if (isLoggedIn) {
-      syncManager.startAutoSync(5000)
-      checkSetupStatus()
-      fetchTodaysClasses()
-      return () => syncManager.stopAutoSync()
-    }
-  }, [isLoggedIn])
+    fetchNotes()
+  }, [])
 
-  const checkSetupStatus = async () => {
+  // Auto-sync every 30 seconds
+  useEffect(() => {
+    const syncInterval = setInterval(syncNotes, 30000)
+    return () => clearInterval(syncInterval)
+  }, [notes])
+
+  // Update editor content when selected note changes
+  useEffect(() => {
+    if (selectedNote && editorRef.current) {
+      editorRef.current.innerHTML = selectedNote.content
+    }
+  }, [selectedNoteId])
+
+  const fetchNotes = async () => {
     try {
-      const status = await setup.getStatus()
-      if (!status.is_setup) {
-        setShowSetup(true)
+      const response = await fetch(`${API_URL}/notes/`)
+      if (response.ok) {
+        const data = await response.json()
+        setNotes(data)
+        if (data.length > 0 && !selectedNoteId) {
+          setSelectedNoteId(data[0].id)
+        }
       }
-      setSetupChecked(true)
     } catch (error) {
-      console.error('Failed to check setup:', error)
-      setSetupChecked(true)
+      console.error('Failed to fetch notes:', error)
     }
   }
 
-  const fetchTodaysClasses = async () => {
+  const syncNotes = async () => {
+    if (notes.length === 0) return
+    setIsSyncing(true)
     try {
-      const classesData = await classes.today()
-      setTodaysClasses(classesData)
+      for (const note of notes) {
+        await fetch(`${API_URL}/notes/${note.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: note.title,
+            content: note.content,
+            pinned: note.pinned
+          })
+        })
+      }
     } catch (error) {
-      console.error('Failed to fetch todays classes:', error)
-    }
-  }
-
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-    setMascotState('concentrating')
-
-    try {
-      const response = await auth.login(username, password)
-      setAuthToken(response.access_token)
-      setIsLoggedIn(true)
-      setMascotState('happy')
-      setTimeout(() => setMascotState('idle'), 600)
-    } catch (err) {
-      setError('Login failed. Please check your credentials.')
-      setMascotState('idle')
+      console.error('Sync failed:', error)
     } finally {
-      setLoading(false)
+      setIsSyncing(false)
     }
   }
 
-  const handleLogout = () => {
-    setAuthToken(null)
-    setIsLoggedIn(false)
-    setUsername('')
-    setPassword('')
-    setWindows({})
-    setMascotState('idle')
-  }
-
-  const toggleWindow = (windowId) => {
-    setWindows((prev) => ({
-      ...prev,
-      [windowId]: {
-        ...prev[windowId],
-        open: !prev[windowId]?.open,
-      },
-    }))
-  }
-
-  const closeWindow = (windowId) => {
-    if (windowId !== 'dashboard') {
-      setWindows((prev) => ({
-        ...prev,
-        [windowId]: { ...prev[windowId], open: false },
-      }))
+  const createNote = async () => {
+    try {
+      const response = await fetch(`${API_URL}/notes/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'Untitled Note',
+          content: '',
+          pinned: false
+        })
+      })
+      if (response.ok) {
+        const newNote = await response.json()
+        setNotes([newNote, ...notes])
+        setSelectedNoteId(newNote.id)
+      }
+    } catch (error) {
+      console.error('Failed to create note:', error)
     }
   }
 
-  if (!isLoggedIn) {
-    return (
-      <div className="login-container">
-        <div className="login-window window" style={{ animation: 'bounce 0.6s ease-out' }}>
-          <div className="window-header">
-            <span>3L ACADEMIC HUB</span>
-            <div style={{ width: '20px' }} />
-          </div>
-          <div className="window-content login-form">
-            <div className="mascot-container">
-              <Mascot state={mascotState} />
-            </div>
-            <h1>Welcome</h1>
-            <p className="login-subtitle">Login to your personal academic hub</p>
+  const deleteNote = async (noteId) => {
+    if (!confirm('Delete this note?')) return
+    try {
+      await fetch(`${API_URL}/notes/${noteId}`, { method: 'DELETE' })
+      setNotes(notes.filter(n => n.id !== noteId))
+      if (selectedNoteId === noteId) {
+        setSelectedNoteId(notes.length > 1 ? notes[0].id : null)
+      }
+    } catch (error) {
+      console.error('Failed to delete note:', error)
+    }
+  }
 
-            <form onSubmit={handleLogin}>
-              {error && <div className="error-message">{error}</div>}
+  const updateNote = (field, value) => {
+    setNotes(notes.map(n =>
+      n.id === selectedNoteId ? { ...n, [field]: value } : n
+    ))
 
-              <div className="form-group">
-                <label>Username</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter username"
-                  disabled={loading}
-                />
-              </div>
+    // Debounced auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current)
+    }
+    autoSaveTimerRef.current = setTimeout(syncNotes, 1000)
+  }
 
-              <div className="form-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  disabled={loading}
-                />
-              </div>
+  const handleEditorInput = () => {
+    if (editorRef.current) {
+      updateNote('content', editorRef.current.innerHTML)
+    }
+  }
 
-              <button type="submit" disabled={loading}>
-                {loading ? 'LOGGING IN...' : 'LOGIN'}
-              </button>
-            </form>
+  const applyFormat = (command, value = null) => {
+    document.execCommand(command, false, value)
+    editorRef.current?.focus()
+  }
 
-            <p className="login-hint">✧ Press START! Try: marie / marie123 ✧</p>
-          </div>
-        </div>
+  const applyHighlight = () => {
+    const selectedColor = prompt('Enter highlight color (hex or name):', '#FFFF00')
+    if (selectedColor) {
+      applyFormat('backColor', selectedColor)
+    }
+  }
+
+  const exportPDF = () => {
+    if (!selectedNote) return
+
+    const element = document.createElement('div')
+    element.innerHTML = `
+      <h1 style="font-family: 'Press Start 2P', cursive; font-size: 20px; margin-bottom: 20px;">
+        ${selectedNote.title}
+      </h1>
+      <div style="font-family: 'VT323', monospace; line-height: 1.6; white-space: pre-wrap;">
+        ${selectedNote.content}
       </div>
-    )
+      <p style="font-size: 10px; color: #999; margin-top: 20px;">
+        Exported from Quick Notes on ${new Date().toLocaleDateString()}
+      </p>
+    `
+
+    const opt = {
+      margin: 10,
+      filename: `${selectedNote.title}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+
+    import('html2pdf.js').then(module => {
+      const html2pdf = module.default
+      html2pdf().set(opt).from(element).save()
+    })
+  }
+
+  const togglePin = () => {
+    updateNote('pinned', !selectedNote.pinned)
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   return (
     <div className="app-container">
-      <div className="header-bar">
-        <div className="header-left">
-          <div className="mascot-mini">
-            <Mascot state={mascotState} />
-          </div>
-          <h1 className="app-title">3L ACADEMIC HUB</h1>
-        </div>
-        <div className="header-center">
-          <SyncIndicator />
-        </div>
-        <div className="header-right">
-          <button className="logout-btn" onClick={handleLogout}>LOGOUT</button>
-        </div>
+      <div className="header">
+        <h1>✧ QUICK NOTES ✧</h1>
       </div>
 
-      <div className="windows-container">
-        {showSetup && setupChecked && (
-          <SetupWizard onComplete={() => setShowSetup(false)} />
-        )}
-
-        {Object.entries(windows).map(([windowId, windowData]) => {
-          if (windowId.startsWith('class-') && windowData.open && windowData.classData) {
-            const classData = windowData.classData
-            return (
-              <Window
-                key={windowId}
-                id={windowId}
-                title={windowData.title}
-                onClose={() => closeWindow(windowId)}
-                zIndex={50}
-              >
-                <div className="class-detail-content">
-                  <div className="class-detail-header">
-                    <div className="class-detail-code">{classData.code}</div>
-                    <div className="class-detail-name">{classData.name}</div>
-                  </div>
-
-                  <div className="class-detail-info">
-                    <div className="info-row">
-                      <span className="info-label">⏰ Time:</span>
-                      <span className="info-value">{classData.start_time} - {classData.end_time}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="info-label">👨‍🏫 Instructor:</span>
-                      <span className="info-value">{classData.instructor}</span>
-                    </div>
-                    {classData.room && (
-                      <div className="info-row">
-                        <span className="info-label">📍 Location:</span>
-                        <span className="info-value">{classData.room}</span>
-                      </div>
-                    )}
-                    {classData.day_of_week && (
-                      <div className="info-row">
-                        <span className="info-label">📅 Day:</span>
-                        <span className="info-value">{classData.day_of_week}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="class-detail-actions">
-                    <button className="action-btn">NEW READING</button>
-                    <button className="action-btn">NEW TODO</button>
-                  </div>
-
-                  {classData.notes && (
-                    <div className="class-detail-notes">
-                      <h3>Notes:</h3>
-                      <p>{classData.notes}</p>
-                    </div>
-                  )}
-                </div>
-              </Window>
-            )
-          }
-          return null
-        })}
-
-        {windows.dashboard?.open && (
-          <Window
-            id="dashboard"
-            title="DASHBOARD"
-            onClose={() => {}}
-            zIndex={100}
-          >
-            <div className="dashboard-content">
-              <h2>📅 Today's Classes</h2>
-              {todaysClasses.length > 0 ? (
-                <div className="todays-classes">
-                  {todaysClasses.map((classItem) => (
-                    <div
-                      key={classItem.id}
-                      className="class-card clickable"
-                      onClick={() => {
-                        setWindows((prev) => ({
-                          ...prev,
-                          [`class-${classItem.id}`]: {
-                            open: true,
-                            title: classItem.code,
-                            classData: classItem,
-                          },
-                        }))
-                      }}
-                    >
-                      <div className="class-time">
-                        {classItem.start_time} - {classItem.end_time}
-                      </div>
-                      <div className="class-name">{classItem.code}</div>
-                      <div className="class-title">{classItem.name}</div>
-                      <div className="class-instructor">{classItem.instructor}</div>
-                      {classItem.room && (
-                        <div className="class-room">📍 {classItem.room}</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="no-classes">No classes today! 🎉</p>
-              )}
-
-              <div className="quick-actions">
-                <button className="action-btn">NEW READING</button>
-                <button className="action-btn">NEW TODO</button>
-              </div>
+      <div className="content">
+        <div className="notes-list">
+          <h2>Notes ({notes.length})</h2>
+          {notes.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#999', fontSize: '11px', marginTop: '16px' }}>
+              No notes yet. Create one!
             </div>
-          </Window>
-        )}
+          ) : (
+            notes.map(note => (
+              <div
+                key={note.id}
+                className={`note-item ${selectedNoteId === note.id ? 'active' : ''} ${note.pinned ? 'pinned' : ''}`}
+                onClick={() => setSelectedNoteId(note.id)}
+              >
+                {note.pinned && <span style={{ marginRight: '4px' }}>📌</span>}
+                <div className="note-item-title">{note.title}</div>
+                <div className="note-item-preview">
+                  {selectedNote?.id === note.id ? note.content.replace(/<[^>]*>/g, '') : note.content.replace(/<[^>]*>/g, '') || '(empty)'}
+                </div>
+                <div className="note-item-meta">{formatDate(note.updated_at)}</div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className={`editor ${!selectedNote ? 'empty' : ''}`}>
+          {!selectedNote ? (
+            <div className="editor-empty-state">
+              <h2>No Note Selected</h2>
+              <p>Create or select a note to start writing</p>
+            </div>
+          ) : (
+            <>
+              <div className="editor-header">
+                <input
+                  type="text"
+                  className="editor-title-input"
+                  value={selectedNote.title}
+                  onChange={(e) => updateNote('title', e.target.value)}
+                  placeholder="Note title..."
+                />
+                <div className="editor-actions">
+                  <button
+                    className={`icon-btn ${selectedNote.pinned ? 'active' : ''}`}
+                    onClick={togglePin}
+                    title="Pin note"
+                  >
+                    📌
+                  </button>
+                  <button
+                    className="icon-btn"
+                    onClick={() => deleteNote(selectedNote.id)}
+                    title="Delete note"
+                  >
+                    🗑️
+                  </button>
+                  <div style={{ fontSize: '10px', color: isSyncing ? '#D46B8B' : '#999', paddingRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    {isSyncing ? '💾' : '✓'}
+                  </div>
+                </div>
+              </div>
+              <RichTextToolbar
+                onBold={() => applyFormat('bold')}
+                onItalic={() => applyFormat('italic')}
+                onUnderline={() => applyFormat('underline')}
+                onHighlight={applyHighlight}
+                onExportPDF={exportPDF}
+              />
+              <div className="editor-content">
+                <div
+                  ref={editorRef}
+                  className="editor-richtext"
+                  contentEditable
+                  onInput={handleEditorInput}
+                  onBlur={handleEditorInput}
+                  placeholder="Start typing..."
+                />
+              </div>
+              <div className="editor-meta">
+                Updated {formatDate(selectedNote.updated_at)}
+              </div>
+            </>
+          )}
+        </div>
       </div>
+
+      <button className="fab" onClick={createNote} title="New note">
+        +
+      </button>
     </div>
   )
 }
